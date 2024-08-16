@@ -27,7 +27,8 @@ bg_surf = pygame.image.load(bg_image_path).convert_alpha()
 
 #import text
 font = pygame.font.Font(font_path,50)
-text_surf = font.render('texasdasdt', True, (255,255,255))
+text_surf = font.render('Asteroid Shooter', True, (255,255,255))
+text_rect = text_surf.get_rect(midbottom = (WINDOW_WIDTH / 2, WINDOW_HEIGHT - 80))
 
 
 #keep code working
@@ -38,15 +39,16 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-    #framerate limi
+
+        if event.type == pygame.MOUSEMOTION:
+            ship_rect.center = event.pos
+
+    #framerate limit
     clock.tick(144)
 
-    #data updates
-    #display_surface.fill((0,0,0))
     display_surface.blit(bg_surf,(0,0))
-    ship_rect.y -= 4
-    display_surface.blit(ship_surf,ship_rect)
-    display_surface.blit(text_surf,(150,150))
 
+    display_surface.blit(ship_surf,ship_rect)
+    display_surface.blit(text_surf,text_rect)
 
     pygame.display.update()
