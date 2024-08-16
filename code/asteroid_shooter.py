@@ -40,8 +40,12 @@ while True:
             pygame.quit()
             sys.exit()
 
-        if event.type == pygame.MOUSEMOTION:
-            ship_rect.center = event.pos
+    #mouse input
+    position = pygame.mouse.get_pos()
+    ship_rect.center = position
+
+    click_pos = pygame.mouse.get_pressed()
+    print(click_pos)
 
     #framerate limit
     clock.tick(144)
