@@ -75,9 +75,8 @@ while True:
 
     for laser in laser_list:
         display_surface.blit(laser_surf, laser)
-
-    for laser in laser_list:
         laser.y -= round(700 * dt)
+
 
     display_surface.blit(ship_surf, ship_rect)
 
