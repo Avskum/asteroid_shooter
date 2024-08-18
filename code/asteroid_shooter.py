@@ -7,7 +7,6 @@ display_surface = pygame.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT))
 window_name = pygame.display.set_caption("Meteor Shooter")
 clock = pygame.time.Clock()
 
-
 ##folders & paths
 game_folder = os.path.dirname(os.path.dirname(__file__))
 
@@ -30,12 +29,14 @@ bg_surf = pygame.image.load(bg_image_path).convert_alpha()
 
 #laser
 laser_surf = pygame.image.load(laser_img_path).convert_alpha()
-laser_rect = laser_surf.get_rect(midbottom = ship_rect.midbottom)
+#laser_rect = laser_surf.get_rect(midbottom = ship_rect.midbottom)
+laser_list = []
 
 #import text
 font = pygame.font.Font(font_path,50)
 text_surf = font.render('Asteroid Shooter', True, (255,255,255))
 text_rect = text_surf.get_rect(midbottom = (WINDOW_WIDTH / 2, WINDOW_HEIGHT - 80))
+
 
 #game loop
 while True:
@@ -47,20 +48,38 @@ while True:
             pygame.quit()
             sys.exit()
 
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            print('shoot laser')
+            laser_rect = laser_surf.get_rect(midbottom=ship_rect.midbottom)
+            laser_list.append(laser_rect)
+            print(laser_list)
+
     #mouse input
     position = pygame.mouse.get_pos()
-
+    ship_rect.center = position
     click_pos = pygame.mouse.get_pressed()
 
-    laser_rect.y -= 4
     #framerate limit
-    clock.tick(144)
+    dt = clock.tick(144) / 1000
+
+    #laser go up
+    #laser_rect.y -= round(400 * dt)
+
+
+
 
     #drwaing of surfs
     display_surface.blit(bg_surf,(0,0))
-    display_surface.blit(ship_surf,ship_rect)
+    pygame.draw.rect(display_surface, (255, 0, 0), text_rect.inflate(10,30), 3, 3)
     display_surface.blit(text_surf,text_rect)
-    display_surface.blit(laser_surf,laser_rect)
+
+    for laser in laser_list:
+        display_surface.blit(laser_surf, laser)
+
+    for laser in laser_list:
+        laser.y -= round(700 * dt)
+
+    display_surface.blit(ship_surf, ship_rect)
 
 
     #draw final frame
