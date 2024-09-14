@@ -1,5 +1,24 @@
 import pygame, sys, os
 
+def laser_update(laser_list, speed = 400):
+    for rect in laser_list:
+        rect.y -= round(speed * dt)
+        if rect.bottom < 0:
+            laser_list.remove(rect)
+
+def display_score():
+    score_text = f'Score: {pygame.time.get_ticks() // 1000}'
+    text_surf = font.render(score_text, True, (255, 255, 255))
+    text_rect = text_surf.get_rect(midbottom=(WINDOW_WIDTH / 2, WINDOW_HEIGHT - 80))
+    pygame.draw.rect(display_surface, (255, 0, 0), text_rect.inflate(10,30), 3, 3)
+    display_surface.blit(text_surf,text_rect)
+
+def laser_timer(can_shoot, duration = 500):
+    if not can_shoot:
+        current_time = pygame.time.get_ticks()
+        if current_time - shoot_time > duration:
+            can_shoot = True
+    return can_shoot
 # game init
 pygame.init()
 WINDOW_WIDTH, WINDOW_HEIGHT = 1280, 720
@@ -32,10 +51,14 @@ laser_surf = pygame.image.load(laser_img_path).convert_alpha()
 #laser_rect = laser_surf.get_rect(midbottom = ship_rect.midbottom)
 laser_list = []
 
+#laser timer
+can_shoot = True
+shoot_time = None
+
 #import text
 font = pygame.font.Font(font_path,50)
-text_surf = font.render('Asteroid Shooter', True, (255,255,255))
-text_rect = text_surf.get_rect(midbottom = (WINDOW_WIDTH / 2, WINDOW_HEIGHT - 80))
+
+
 
 
 #game loop
@@ -48,11 +71,15 @@ while True:
             pygame.quit()
             sys.exit()
 
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            print('shoot laser')
+        if event.type == pygame.MOUSEBUTTONDOWN and can_shoot:
+
+            #laser
             laser_rect = laser_surf.get_rect(midbottom=ship_rect.midbottom)
             laser_list.append(laser_rect)
-            print(laser_list)
+
+            #timer
+            can_shoot = False
+            shoot_time = pygame.time.get_ticks()
 
     #mouse input
     position = pygame.mouse.get_pos()
@@ -63,23 +90,20 @@ while True:
     dt = clock.tick(144) / 1000
 
     #laser go up
-    #laser_rect.y -= round(400 * dt)
-
-
-
+    laser_update(laser_list)
+    can_shoot = laser_timer(can_shoot, 400)
 
     #drwaing of surfs
     display_surface.blit(bg_surf,(0,0))
-    pygame.draw.rect(display_surface, (255, 0, 0), text_rect.inflate(10,30), 3, 3)
-    display_surface.blit(text_surf,text_rect)
 
-    for laser in laser_list:
-        display_surface.blit(laser_surf, laser)
-        laser.y -= round(700 * dt)
+    display_score()
 
+
+    for rect in laser_list:
+        display_surface.blit(laser_surf, rect)
 
     display_surface.blit(ship_surf, ship_rect)
 
-
     #draw final frame
     pygame.display.update()
+    #print(len(laser_list))
