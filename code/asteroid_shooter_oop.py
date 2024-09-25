@@ -9,6 +9,12 @@ class Ship(pygame.sprite.Sprite):
         #rect img
         self.rect = self.image.get_rect(center = (WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2))
 
+    def input_position(self):
+        pos = pygame.mouse.get_pos()
+        self.rect.center = pos
+
+    def update(self):
+        self.input_position()
 class Laser(pygame.sprite.Sprite):
     def __init__(self,pos,groups):
         super().__init__(groups)
@@ -32,6 +38,7 @@ laser_group = pygame.sprite.Group()
 
 #sprite creation
 ship = Ship(spaceship_group)
+
 laser = Laser((100,300),laser_group)
 
 #main game loop
@@ -47,6 +54,10 @@ while True:
 
     #background
     display_surface.blit(backgroud_surf,(0,0))
+
+
+    #update
+    spaceship_group.update()
 
 
     #graphics
