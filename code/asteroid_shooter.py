@@ -1,4 +1,8 @@
 import pygame, sys, os
+from random import randint, uniform
+
+from pygame import Vector2
+
 
 def laser_update(laser_list, speed = 400):
     for rect in laser_list:
@@ -6,11 +10,13 @@ def laser_update(laser_list, speed = 400):
         if rect.bottom < 0:
             laser_list.remove(rect)
 
-def meteor_update(meteor_list, speed = 400):
-    for rect in meteor_list:
-        rect.y += speed * dt
-        if rect.top > WINDOW_HEIGHT:
-            meteor_list.remove(rect)
+def meteor_update(meteor_list, speed = 10):
+    for meteor_tuple in meteor_list:
+        direction = meteor_tuple[1]
+        meteor_rect = meteor_tuple[0]
+        meteor_rect.center += direction * speed * dt
+        if meteor_rect.top > WINDOW_HEIGHT:
+            meteor_list.remove(meteor_tuple)
 
 
 def display_score():
@@ -75,7 +81,7 @@ font = pygame.font.Font(font_path,50)
 
 #meteor timer
 meteor_timer = pygame.event.custom_type()
-pygame.time.set_timer(meteor_timer,500)
+pygame.time.set_timer(meteor_timer,2000)
 
 #game loop
 while True:
@@ -98,10 +104,16 @@ while True:
             shoot_time = pygame.time.get_ticks()
 
         if event.type == meteor_timer:
+            x_pos = randint(-100,WINDOW_WIDTH + 100)
+            y_pos = randint(-100,-50)
 
             #meteor
-            meteor_rect = meteor_surf.get_rect(center = (640,-100))
-            meteor_list.append(meteor_rect)
+            meteor_rect = meteor_surf.get_rect(center=(x_pos, -y_pos))
+
+            #create rand dir
+            direction = pygame.math.Vector2(uniform(-0.5, 0.5), 1)
+
+            meteor_list.append((meteor_rect,direction))
 
 
 
@@ -116,8 +128,24 @@ while True:
 
     #UPDATE
     laser_update(laser_list)
-    meteor_update(meteor_list, 500)
+    meteor_update(meteor_list, 300)
     can_shoot = laser_timer(can_shoot, 400)
+
+    #meteor ship collisions
+    for meter_tuple in meteor_list:
+        meteor_rect = meter_tuple[0]
+        if ship_rect.colliderect(meteor_rect):
+            pygame.quit()
+            sys.exit()
+
+
+    #laser meteor collisions
+    for laser_rect in laser_list:
+        for meteor_tuple in meteor_list:
+            if laser_rect.colliderect(meteor_tuple[0]):
+                meteor_list.remove(meteor_tuple)
+                laser_list.remove(laser_rect)
+                print('collision')
 
     #drwaing of surfs
     display_surface.blit(bg_surf,(0,0))
@@ -128,8 +156,8 @@ while True:
     for rect in laser_list:
         display_surface.blit(laser_surf, rect)
 
-    for rect in meteor_list:
-        display_surface.blit(meteor_surf, rect)
+    for meter_tuple in meteor_list:
+        display_surface.blit(meteor_surf, meter_tuple[0])
 
     display_surface.blit(ship_surf, ship_rect)
 
