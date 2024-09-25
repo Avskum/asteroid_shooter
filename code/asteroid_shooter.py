@@ -44,6 +44,8 @@ clock = pygame.time.Clock()
 game_folder = os.path.dirname(os.path.dirname(__file__))
 
 graphics_folder = os.path.join(game_folder, 'graphics')
+sounds_folder = os.path.join(game_folder, 'sounds')
+
 ship_image_path = os.path.join(graphics_folder, 'ship.png')
 bg_image_path = os.path.join(graphics_folder, 'background.png')
 laser_img_path = os.path.join(graphics_folder, 'laser.png')
@@ -51,7 +53,15 @@ meteor_img_path = os.path.join(graphics_folder, 'meteor.png')
 
 font_path = os.path.join(graphics_folder, 'subatomic.ttf')
 
+#sounds
+laser_sound_path = os.path.join(sounds_folder, 'laser.ogg')
+laser_sound = pygame.mixer.Sound(laser_sound_path)
 
+explosion_sound_path = os.path.join(sounds_folder, 'explosion.wav')
+explosion_sound = pygame.mixer.Sound(explosion_sound_path)
+
+music_sound_path = os.path.join(sounds_folder, 'music.wav')
+music_sound = pygame.mixer.Sound(music_sound_path)
 
 
 #import ship
@@ -86,6 +96,7 @@ pygame.time.set_timer(meteor_timer,2000)
 #game loop
 while True:
     display_surface
+    music_sound.play(loops = -1)
 
     #event loop
     for event in pygame.event.get():
@@ -102,6 +113,9 @@ while True:
             #timer
             can_shoot = False
             shoot_time = pygame.time.get_ticks()
+
+            #play laser sound
+            laser_sound.play()
 
         if event.type == meteor_timer:
             x_pos = randint(-100,WINDOW_WIDTH + 100)
@@ -145,7 +159,7 @@ while True:
             if laser_rect.colliderect(meteor_tuple[0]):
                 meteor_list.remove(meteor_tuple)
                 laser_list.remove(laser_rect)
-                print('collision')
+                explosion_sound.play()
 
     #drwaing of surfs
     display_surface.blit(bg_surf,(0,0))
